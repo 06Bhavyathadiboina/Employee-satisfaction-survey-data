@@ -1,0 +1,11 @@
+def correlation_matrix(data: DataFrame, method="pearson"):
+    corr = data.corr(numeric_only=True, method=method)
+    mask = np.triu(np.ones_like(corr, dtype=bool))
+    
+    fig, ax = plt.subplots(figsize=(7, 3))
+    sns.heatmap(corr, annot=True, mask=mask, fmt=".1%", cmap="magma")
+    ax.grid(False)
+    ax.set_title("Corration Matrix")
+    plt.show()
+    
+correlation_matrix(df, method="pearson")
