@@ -1,0 +1,58 @@
+Question 2
+def detect_outliers(X: ArrayLike, multiply_by=1.5):
+    assert (multiply_by >= 0) and (multiply_by <= 3), "Multiply by must be between zero (0) and one (3)!"
+    
+    q1, q2, q3 = np.quantile(X, [0.25, 0.5, 0.75])
+    iqr = q3 - q1
+    lower_lim = q1 - (multiply_by*iqr)
+    upper_lim = q3 + (multiply_by*iqr)
+    return X[(X < lower_lim) | (X > upper_lim)]
+
+def boxplot(df: DataFrame, figsize=(12, 6)):
+    numb_columns = df.select_dtypes(np.number).columns
+    
+    fig:plt.Figure= plt.figure(figsize=figsize, facecolor="linen")
+    fig.patch.set_alpha(0)
+    colors = ["y", "lightblue", "c", "b", "r", "g", "grey"]
+    for i, (col, c) in enumerate(zip(numb_columns, colors), start=1):
+        ax:plt.Axes = fig.add_subplot(2, 4, i)
+        data = df[col].values
+        sns.boxplot(data=data, ax=ax, orient="v", color=c)
+        ax.set_xlabel(col)
+        current_values = plt.gca().get_xticks()
+        plt.gca().set_xticklabels(['{:.1f}'.format(x) for x in current_values])
+        
+        xlm = np.array(ax.get_xlim())
+        ax.set_xlim(xlm + np.array([-0.1, 0.1]))
+        
+        ylm = np.array(ax.get_ylim())
+        ax.set_ylim(ylm + np.array([-0.17, 0.17]))
+        outliers = np.unique(detect_outliers(data))
+        for outlier in outliers:
+        plt.text(0.15, outlier-0.05, f"{outlier:.0f}*", ha="center")
+        ax.xaxis.set_visible(False)
+        ax.set_ylabel(col)
+        plt.tight_layout()
+        plt.show
+
+boxplot(df)
+
+def get_outliers(df: DataFrame):
+    data = df.select_dtypes("number").to_dict(orient="list")
+    outlier_count = {k: Counter(detect_outliers(np.array(v))) for k, v in data.\
+                     items() if len(detect_outliers(np.array(v))) > 0}
+    return outlier_count
+
+# This code gets the outliers as keys and counts of outliers as values in the Counter object
+get_outliers(df)
+
+outliers = pd.DataFrame(get_outliers(df)).T
+outliers.columns = np.int64(outliers.columns)
+
+fig, ax = plt.subplots(figsize=(6, 3))
+outliers.plot(kind = "bar", ax=ax, width=1.3)
+plt.legend(facecolor="inherit", shadow=True, frameon=True, title="Outliers", loc="best")
+plt.xticks(rotation=0, fontsize=9)
+plt.title("Outliers in the data and their counts", size=11)
+# plt.tick_params()
+plt.show()
