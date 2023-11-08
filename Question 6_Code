@@ -1,0 +1,22 @@
+Question 6
+
+satisfaction_salary_dept = df.groupby(["salary", "dept"])[["satisfaction_level"]].agg([np.mean]).unstack()
+
+columns = satisfaction_salary_dept.columns
+dept_values = columns.get_level_values('dept').to_list()
+satisfaction_salary_dept.columns = dept_values
+
+styled_df = satisfaction_salary_dept.style.format("{:.3f}").\
+    background_gradient(cmap="magma", axis=0).set_caption('Satisfaction Level by Salary and Department')
+
+styled_df = styled_df.set_table_styles([{'selector': 'caption',
+                                         'props': [('font-size', '10pt'),
+                                                   ('font-weight', 'bold'),
+                                                   ('text-align', 'left'),
+                                                   ('color', 'blue')]}])
+
+styled_df
+
+fig = sns.pairplot(df, corner=True, kind="reg", diag_kind="kde")
+fig.fig.suptitle("Scatter Plot among the various numerical variables", y=1.0, fontsize=17)
+plt.show()
