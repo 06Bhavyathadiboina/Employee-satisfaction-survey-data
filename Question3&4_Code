@@ -1,0 +1,28 @@
+Question 3
+
+def make_barchart(df):
+    categories = df.select_dtypes("category").columns
+    fig:plt.Figure = plt.figure(figsize=(9, 3.5))
+    for i, category in enumerate(categories, start=1):
+        ax:plt.Axes = fig.add_subplot(1, 2, i)
+        data:Series = df[category].value_counts()
+            
+        x = data.index.to_list(); y = data.values;
+
+        sns.barplot(x=x, y=y, ax=ax, capsize=5)
+        plt.xticks(rotation=90)
+        plt.yticks(size=9)
+        ax.set_title(category, size=10)
+        
+        for i in ax.containers:
+            plt.bar_label(i, fontsize=8)
+      plt.tight_layout()
+      plt.suptitle("Count of frequency of categorical variables", y=1.004, size=11)   
+      plt.show()
+    
+make_barchart(df)
+
+Question 4
+
+df.groupby("salary").apply(np.mean).style.format("{:.3f}").\
+        background_gradient(cmap="Blues", axis=0).set_caption('Mean for of the variables for different salary categories')
